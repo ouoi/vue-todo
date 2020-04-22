@@ -6,7 +6,7 @@
       <IconButton class="add-button" @click="addToDo">
         <font-awesome-icon icon="plus" />
       </IconButton>
-      <input type="text" placeholder="add To Do" v-model="addTitle" @keydown.enter="addToDo"/>
+      <input type="text" placeholder="할 일 추가하기" v-model="addTitle" @keydown="keydownTitle"/>
     </ToDoCard>
     <ToDoCard v-for="(item, key) in items" :key="key" class="to-do-item">
       <ToDoItem :id="key" :item="item" @click="showToDoModal" @remove="removeToDo" />
@@ -14,12 +14,16 @@
 
     <ToDoModal :show.sync="showModal">
       <div v-if="selectedKey && selectedItem" class="to-do-detail">
-        <ToDoItem :id="selectedKey" :item="selectedItem" @remove="removeToDo">
+        <ToDoItem :id="selectedKey" :item="selectedItem" hidden-extra-data @remove="removeToDo">
           <template #title>
             <input v-model="selectedItem.title" />
           </template>
         </ToDoItem>
         <textarea type="text" v-model="selectedItem.contents" placeholder="내용 추가" class="to-do-contents" />
+        <div class="to-do-due-date">
+          <font-awesome-icon icon="calendar-alt" />
+          <input type="date" v-model="selectedItem.dueDate" />
+        </div>
       </div>
     </ToDoModal>
   </div>
@@ -55,15 +59,25 @@ export default {
   methods: {
     addToDo () {
       if (!this.addTitle) {
+        alert('제목을 입력해주세요.')
+        return
+      } else if (Object.keys(this.items).find(key => this.items[key].title === this.addTitle)) {
+        alert('동일한 제목이 존재합니다.')
         return
       }
+
       this.$set(this.items, generateKey(), {
         title: this.addTitle,
         contents: '',
         completed: false,
-        dueDate: new Date()
+        dueDate: null
       })
       this.addTitle = ''
+    },
+    keydownTitle (e) {
+      if (e.keyCode === 13) {
+        this.addToDo()
+      }
     },
     removeToDo (key) {
       this.showModal = false
@@ -136,6 +150,14 @@ input {
     border-radius: 4px;
     margin-top: 16px;
     font-size: 14px;
+  }
+  .to-do-due-date {
+    margin-top: 10px;
+    display: flex;
+    svg {
+      color: #aaa;
+      margin-right: 10px;
+    }
   }
 }
 </style>

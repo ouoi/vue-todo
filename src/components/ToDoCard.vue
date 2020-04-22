@@ -11,6 +11,6 @@
   border: 1px solid #ebeef5;
   border-radius: 4px;
   margin: 10px 0;
-  font-size: 20px;
+  font-size: 16px;
 }
 </style>
