@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { dateDiff } from '@/utils'
 import { setLocalStorage, getLocalStorage } from '@/utils/localStorage'
 
 import ToDoCard from './ToDoCard'
@@ -73,6 +74,7 @@ export default {
   },
   created () {
     this.items = getLocalStorage(LOCAL_STORAGE_KEY) || {}
+    setTimeout(this.alertDueDate, 1000)
   },
   methods: {
     addToDo () {
@@ -119,6 +121,18 @@ export default {
       } else {
         alert('해당 아이템이 없습니다.')
         return false
+      }
+    },
+    alertDueDate () {
+      let count = 0
+      Object.keys(this.items).forEach(key => {
+        const { completed, dueDate } = this.items[key]
+        if (!completed && dateDiff(new Date(), dueDate) < 0) {
+          count++
+        }
+      })
+      if (count > 0) {
+        alert(`마감 기한이 지난 할 일이 ${count}개 있습니다.`)
       }
     }
   }
