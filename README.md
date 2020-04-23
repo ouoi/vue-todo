@@ -16,7 +16,7 @@ yarn start
 
 ```
 
-# Description
+## Description
 
 - [Vue.js](https://vuejs.org/) 프레임워크를 사용하였습니다.
 - 프로젝트 생성은 [Vue CLI](https://cli.vuejs.org/)를 사용하여 생성하였습니다.
