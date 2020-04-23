@@ -5,7 +5,7 @@
         <font-awesome-icon v-if="item.completed" icon="check-circle" />
         <font-awesome-icon v-else icon="circle" />
       </IconButton>
-      <div class="title" @click="$emit('click', id)">
+      <div class="title" @click="$emit('click', item)">
         <slot name="title">
           {{ item.title }}
         </slot>
@@ -29,10 +29,6 @@ export default {
     IconButton
   },
   props: {
-    id: {
-      type: String,
-      required: true
-    },
     item: {
       type: Object,
       required: true
@@ -41,7 +37,9 @@ export default {
   },
   computed: {
     dueDateType () {
-      if (this.item.dueDate) {
+      if (this.item.completed) {
+        return 'success'
+      } else if (this.item.dueDate) {
         const diff = dateDiff(new Date(), this.item.dueDate)
         if (diff < 0) {
           return 'error'
@@ -58,7 +56,7 @@ export default {
     },
     remove () {
       if (confirm(`'${this.item.title}'을(를) 삭제하시겠습니까?`)) {
-        this.$emit('remove', this.id)
+        this.$emit('remove', this.item)
       }
     }
   }
@@ -100,6 +98,10 @@ export default {
       border-radius: 3px;
       padding: 1px 4px;
       color: #606262;
+      &.success {
+        background-color: #f0fefc;
+        color: #17ccb4;
+      }
       &.warning {
         background-color: #fff7ee;
         color: #ff9117;

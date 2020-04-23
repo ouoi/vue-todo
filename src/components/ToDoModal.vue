@@ -1,7 +1,6 @@
 <template>
-  <div v-if="show">
-    <div class="dim" @click="close" />
-    <div class="to-do-modal">
+  <div v-if="show" class="dim" @click="close">
+    <div class="to-do-modal" @click.stop>
       <slot />
       <div class="button-container">
         <button @click="close">닫기</button>
@@ -31,13 +30,14 @@ export default {
   top: 0;
   bottom: 0;
   z-index: 1000;
-  background-color: #000;
-  opacity: 0.5;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .to-do-modal {
   position: relative;
+  top: 100px;
   display: block;
+  width: 100%;
   max-width: 420px;
   min-height: 100px;
   padding: 20px;

@@ -9,21 +9,29 @@
       <input type="text" placeholder="할 일 추가하기" v-model="addTitle" @keydown="keydownTitle"/>
     </ToDoCard>
 
-    <ToDoCard v-for="(item, key) in progressItems" :key="key" class="to-do-item">
-      <ToDoItem :id="key" :item="item" @click="showToDoModal" @remove="removeToDo" />
-    </ToDoCard>
+    <Draggable v-model="items">
+      <transition-group>
+        <ToDoCard v-for="item in progressItems" :key="item.id" class="to-do-item">
+          <ToDoItem :item="item" @click="showToDoModal" @remove="removeToDo" />
+        </ToDoCard>
+      </transition-group>
+    </Draggable>
 
     <div class="completed-title">
       <h2>완료된 할 일</h2>
     </div>
 
-    <ToDoCard v-for="(item, key) in completedItems" :key="key" class="to-do-item">
-      <ToDoItem :id="key" :item="item" @click="showToDoModal" @remove="removeToDo" />
-    </ToDoCard>
+  <Draggable v-model="items">
+    <transition-group>
+      <ToDoCard v-for="item in completedItems" :key="item.id" class="to-do-item">
+        <ToDoItem :item="item" @click="showToDoModal" @remove="removeToDo" />
+      </ToDoCard>
+    </transition-group>
+  </Draggable>
 
     <ToDoModal :show.sync="showModal">
-      <div v-if="selectedKey && selectedItem" class="to-do-detail">
-        <ToDoItem :id="selectedKey" :item="selectedItem" hidden-extra-data @remove="removeToDo">
+      <div v-if="selectedItem" class="to-do-detail">
+        <ToDoItem :item="selectedItem" hidden-extra-data @remove="removeToDo">
           <template #title>
             <input v-model="selectedItem.title" />
           </template>
@@ -46,6 +54,7 @@ import ToDoCard from './ToDoCard'
 import ToDoItem from './ToDoItem'
 import ToDoModal from './ToDoModal'
 import IconButton from './IconButton'
+import Draggable from 'vuedraggable'
 
 const LOCAL_STORAGE_KEY = 'to-do-list'
 
@@ -59,35 +68,23 @@ export default {
     ToDoCard,
     ToDoItem,
     ToDoModal,
-    IconButton
+    IconButton,
+    Draggable
   },
   data () {
     return {
-      items: {},
+      items: [],
       addTitle: '',
       showModal: false,
-      selectedKey: null,
       selectedItem: null
     }
   },
   computed: {
     progressItems () {
-      const progressItems = {}
-      Object.entries(this.items).forEach(([key, item]) => {
-        if (!item.completed) {
-          progressItems[key] = item
-        }
-      })
-      return progressItems
+      return this.items.filter(({ completed }) => !completed)
     },
     completedItems () {
-      const completedItems = {}
-      Object.entries(this.items).forEach(([key, item]) => {
-        if (item.completed) {
-          completedItems[key] = item
-        }
-      })
-      return completedItems
+      return this.items.filter(({ completed }) => completed)
     }
   },
   watch: {
@@ -101,7 +98,7 @@ export default {
     }
   },
   created () {
-    this.items = getLocalStorage(LOCAL_STORAGE_KEY) || {}
+    this.items = getLocalStorage(LOCAL_STORAGE_KEY) || []
     setTimeout(this.alertDueDate, 1000)
   },
   methods: {
@@ -109,17 +106,19 @@ export default {
       if (!this.addTitle) {
         alert('제목을 입력해주세요.')
         return
-      } else if (Object.keys(this.items).find(key => this.items[key].title === this.addTitle)) {
+      } else if (this.items.find(({ title }) => title === this.addTitle)) {
         alert('동일한 제목이 존재합니다.')
         return
       }
 
-      this.$set(this.items, generateKey(), {
+      this.items.unshift({
+        id: generateKey(),
         title: this.addTitle,
         contents: '',
         completed: false,
         dueDate: null
       })
+
       this.addTitle = ''
     },
     keydownTitle (e) {
@@ -127,35 +126,31 @@ export default {
         this.addToDo()
       }
     },
-    removeToDo (key) {
+    removeToDo (item) {
+      console.log(item)
+      const itemIndex = this.findItemIndex(item)
+      if (itemIndex < 0) {
+        return
+      }
+
+      this.items.splice(itemIndex, 1)
       this.showModal = false
-      const cloneItems = { ...this.items }
-      delete cloneItems[key]
-      this.items = cloneItems
     },
-    showToDoModal (key) {
-      if (this.checkExistItem(key)) {
-        this.selectedKey = key
-        this.selectedItem = this.items[key]
-        this.showModal = true
-      } else {
-        this.selectedKey = null
-        this.selectedItem = null
-      }
+    showToDoModal (item) {
+      this.selectedItem = item
+      this.showModal = true
     },
-    checkExistItem (key) {
-      if (this.items[key]) {
-        return true
-      } else {
+    findItemIndex (item) {
+      const itemIndex = item ? this.items.findIndex(({ id }) => id === item.id) : -1
+      if (itemIndex < 0) {
         alert('해당 아이템이 없습니다.')
-        return false
       }
+      return itemIndex
     },
     alertDueDate () {
       let count = 0
-      Object.keys(this.items).forEach(key => {
-        const { completed, dueDate } = this.items[key]
-        if (!completed && dateDiff(new Date(), dueDate) < 0) {
+      this.items.forEach(({ completed, dueDate }) => {
+        if (!completed && dueDate && dateDiff(new Date(), dueDate) < 0) {
           count++
         }
       })

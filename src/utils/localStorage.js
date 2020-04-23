@@ -7,7 +7,7 @@ export const setLocalStorage = (key, value) => {
     if (typeof value === 'object') {
       window.localStorage.setItem(key, JSON.stringify(value))
     } else {
-      console.error('객체 타입의 데이터만 저장이 가능합니다.')
+      alert('객체 타입의 데이터만 저장이 가능합니다.')
     }
   } catch (e) {
     alert('데이터 저장에 실패하였습니다.')
