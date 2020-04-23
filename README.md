@@ -5,23 +5,24 @@
 ## Build Setup
 
 ``` bash
-# install dependencies
-npm install
+# yarn 설치
+npm install -g yarn
 
-# serve with hot reload at localhost:8080
-npm run dev
+# dependencies 설치
+yarn
 
-# build for production with minification
-npm run build
+# 서버 실행 (localhost:8080)
+yarn start
 
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run all tests
-npm test
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+# Description
+
+- [Vue.js](https://vuejs.org/) 프레임워크를 사용하였습니다.
+- 프로젝트 생성은 [Vue CLI](https://cli.vuejs.org/)를 사용하여 생성하였습니다.
+- eslint rule 은 [standard](https://github.com/standard/standard/blob/master/docs/README-kokr.md)를 적용하였습니다. 
+- Vue Router가 포함되어있긴 하지만 router 이동이 없어서 큰 의미는 없습니다.
+- API 서버는 따로 없고, 브라우저의 localStorage에 데이터를 저장하도록 하였습니다.
+- 상태 관리까지는 필요 없어서 Vuex를 사용하지는 않았습니다.
+- 아이콘은 [vue-fontawesome](https://fontawesome.com/how-to-use/on-the-web/using-with/vuejs)을 사용하였습니다.
+- D&D 우선순위 조정에 필요한 라이브러리는 [Vue.Draggable](https://github.com/SortableJS/Vue.Draggable)를 사용하였습니다.
