@@ -8,7 +8,16 @@
       </IconButton>
       <input type="text" placeholder="할 일 추가하기" v-model="addTitle" @keydown="keydownTitle"/>
     </ToDoCard>
-    <ToDoCard v-for="(item, key) in items" :key="key" class="to-do-item">
+
+    <ToDoCard v-for="(item, key) in progressItems" :key="key" class="to-do-item">
+      <ToDoItem :id="key" :item="item" @click="showToDoModal" @remove="removeToDo" />
+    </ToDoCard>
+
+    <div class="completed-title">
+      <h2>완료된 할 일</h2>
+    </div>
+
+    <ToDoCard v-for="(item, key) in completedItems" :key="key" class="to-do-item">
       <ToDoItem :id="key" :item="item" @click="showToDoModal" @remove="removeToDo" />
     </ToDoCard>
 
@@ -61,11 +70,30 @@ export default {
       selectedItem: null
     }
   },
+  computed: {
+    progressItems () {
+      const progressItems = {}
+      Object.entries(this.items).forEach(([key, item]) => {
+        if (!item.completed) {
+          progressItems[key] = item
+        }
+      })
+      return progressItems
+    },
+    completedItems () {
+      const completedItems = {}
+      Object.entries(this.items).forEach(([key, item]) => {
+        if (item.completed) {
+          completedItems[key] = item
+        }
+      })
+      return completedItems
+    }
+  },
   watch: {
     items: {
       deep: true,
       handler (v) {
-        console.log(v)
         if (v) {
           setLocalStorage(LOCAL_STORAGE_KEY, v)
         }
@@ -190,6 +218,26 @@ input {
       color: #aaa;
       margin-right: 10px;
     }
+  }
+}
+
+.completed-title {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: #fff;
+  text-align: center;
+  margin-top: 60px;
+
+  &::before,
+  &::after {
+    content: '';
+    border-top: 1px solid #fff;
+    flex: 1;
+  }
+  h2 {
+    margin: 0 20px;
   }
 }
 </style>
