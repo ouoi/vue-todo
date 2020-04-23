@@ -30,10 +30,14 @@
 </template>
 
 <script>
+import { setLocalStorage, getLocalStorage } from '@/utils/localStorage'
+
 import ToDoCard from './ToDoCard'
 import ToDoItem from './ToDoItem'
 import ToDoModal from './ToDoModal'
 import IconButton from './IconButton'
+
+const LOCAL_STORAGE_KEY = 'to-do-list'
 
 function generateKey () {
   return Math.random().toString(16).substr(2, 8)
@@ -55,6 +59,20 @@ export default {
       selectedKey: null,
       selectedItem: null
     }
+  },
+  watch: {
+    items: {
+      deep: true,
+      handler (v) {
+        console.log(v)
+        if (v) {
+          setLocalStorage(LOCAL_STORAGE_KEY, v)
+        }
+      }
+    }
+  },
+  created () {
+    this.items = getLocalStorage(LOCAL_STORAGE_KEY) || {}
   },
   methods: {
     addToDo () {
